@@ -1,1 +1,2 @@
-from .Infos import InfosApi
+from .Info import InfoApi
+from .Infos import InfosList, InfosUpdate

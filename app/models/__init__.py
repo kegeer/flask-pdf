@@ -16,8 +16,8 @@ from .Result import Result
 from .Ref import Ref, RefSchema
 from .Client import Client
 from .Info import Info, InfoSchema
-from .Disease import Disease
-from .General import General
-from .Genus import Genus
-from .Metabolism import Metabolism
-from .Species import Species
+from .Disease import Disease, DiseaseSchema
+from .General import General, GeneralSchema
+from .Genus import Genus, GenusSchema
+from .Metabolism import Metabolism, MetabolismSchema
+from .Species import Species, SpeciesSchema

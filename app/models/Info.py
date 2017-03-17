@@ -1,8 +1,8 @@
 from ..extensions import db, ma
-from marshmallow_jsonapi import Schema, fields
-from marshmallow import validate
-from . import RefSchema
-from . import CRUD
+from . import RefSchema, CRUD
+from app.exceptions import ValidationError
+
+
 class Info(db.Model, CRUD):
     __tablename__ =  'infos'
     id = db.Column(db.Integer, primary_key=True)
@@ -26,30 +26,27 @@ class Info(db.Model, CRUD):
     def __repr__(self):
         return "<Model Info `{}`>".format(self.c_name)
 
+    def import_data(self, data):
+        try:
+            self.c_name = data['c_name']
+            self.e_name = data['e_name']
+            self.type = data['type']
+            self.desc = data['desc']
+            self.ref_min = float(data['ref_min'])
+            self.ref_max = float(data['ref_max'])
+        except KeyError as e:
+            raise ValidationError("Invalid Information: missing " + e.args[0])
 
-# class InfoSchema(ma.ModelSchema):
-#     refs = ma.Nested(RefSchema, many=True)
-#     class Meta:
-#         model = Info
-#
-#     @post_dump(pass_many=True)
-#     def wrap_if_many(self, data, many=False):
-#         if many:
-#             return {'infos': data}
-#         return data
 
-class InfoSchema(Schema):
-    not_blank = validate.Length(min=1, error='Field cannot be blank')
-    c_name = fields.String(validate=not_blank)
-    e_name = fields.String(validate=not_blank)
-
-    def get_top_level_links(self, data, many):
-        if many:
-            self_link = "/infos/"
-        else:
-            self_link = '/users/{}'.format(data['id'])
-        return {'self': self_link}
-
+class InfoSchema(ma.ModelSchema):
+    refs = ma.Nested(RefSchema, many=True)
     class Meta:
-        type='info'
+        model = Info
+
+    # @post_dump(pass_many=True)
+    # def wrap_if_many(self, data, many=False):
+    #     if many:
+    #         return {'infos': data}
+    #     return data
+
 

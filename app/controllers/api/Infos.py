@@ -4,13 +4,14 @@ from flask import request, jsonify, make_response
 from app.extensions import db
 schema = InfoSchema
 
-class InfosApi(Resource):
-    def get(self, info_id=None):
-        if info_id:
-            info_query = Info.query.get_or_404(info_id)
-            info = schema.dump(info_query).data
-            return info
-        infos = schema.dump(Info.query.all(), many=True).data
+from sqlalchemy.exc import SQLAlchemyError
+from marshmallow import ValidationError
+
+
+class InfosList(Resource):
+    def get(self):
+        infos_query = Info.query.all()
+        infos = schema.dump(infos_query, many=True).data
         return infos
     def post(self):
         raw_dict = request.get_json(force=True)
@@ -29,8 +30,14 @@ class InfosApi(Resource):
         except SQLAlchemyError as e:
             db.session.rollback()
             resp = jsonify({'error': str(e)})
-            resp.status_code=403
+            resp.status_code = 403
             return resp
+
+class InfosUpdate(Resource):
+    def get(self, info_id=None):
+        info_query = Info.query.get_or_404(info_id)
+        info = schema.dump(info_query).data
+        return info
     def patch(self, info_id):
         info = Info.query.get_or_404(info_id)
         raw_dict = request.get_json(force=True)
