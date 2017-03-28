@@ -4,4 +4,8 @@ class ProdConfig(Config):
     pass
 class DevConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:root@localhost:3306/pdf-db?charset=utf8'
+    NAME = 'kaige'
+    PASSWORD = 'kaige'
+    IP = '192.168.1.60'
+    DB = 'pdf'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://' + NAME + ':' + PASSWORD + '@' + IP + ':3306/' + DB + '?charset=utf8'

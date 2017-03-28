@@ -12,22 +12,21 @@ class InfoApi(Resource):
         if info_id:
             info = Info.query.get(info_id)
             if info:
-                return InfoSer.dump(info)
+                return InfoSer.dump(info).data
             else:
                 return {'error': 'Info cannot be found'}
 
         return InfoSer.dump(Info.query.all(), many=True).data
 
-    def post(self, info_id=None):
-        if info_id:
-            abort(400)
-        json = request.get_json()
+    def post(self):
+        json = request.get_json(force=True)
         if not json:
             return {'success': False, 'msg': 'NO Info provided'}, 400
         return self.entity_add(json)
 
-    def patch(self, info_id):
+    def put(self, info_id):
         json = request.get_json(force=True)
+        # return json
         self.update_refs(json)
         type = json['type']
         self.entity_update(type, info_id, json)
@@ -86,7 +85,9 @@ class InfoApi(Resource):
             entity = Disease()
         else:
             abort(401)
+
         val = entity.query.get_or_404(info_id)
+
         for key, value in json.items():
             setattr(val, key, value)
         val.update()
@@ -95,7 +96,7 @@ class InfoApi(Resource):
         refs = json.pop('refs')
         ref = Ref()
         for re in refs:
-            if 'id' in re:
+            if re['id'] and 'id' in re:
                 ref_query = ref.query.get(re['id'])
                 for key, value in re.items():
                     setattr(ref_query, key, value)
